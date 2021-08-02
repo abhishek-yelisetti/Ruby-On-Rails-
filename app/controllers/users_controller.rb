@@ -19,7 +19,7 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
 
     if @user.save
-      session[:user_id] = @user.id
+      session[:user_id] = nil if @user == current_user
       flash[:notice] = "Welcome to the Alpha Blog #{@user.username}, you have succesfully signed up"
       redirect_to @user
     else
@@ -58,8 +58,8 @@ class UsersController < ApplicationController
   end
 
   def require_same_user
-    if current_user != @user
-      flash[:alert] = "You can only edit your own account"
+    if current_user != @user && !current_user.admin?
+      flash[:alert] = "You can only edit or delete your own account"
       redirect_to @user
     end
   end
